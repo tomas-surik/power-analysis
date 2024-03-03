@@ -1,2 +1,2 @@
 FROM jupyter/datascience-notebook
-RUN pip install tensorflow tensorboard
+RUN pip install torch==2.2.1
