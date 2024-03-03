@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
-from data_generator import DataGenerator, NeuralNetwork
+from multiprocessing import Pool
+from data_generator import DataGenerator
+from model import NeuralNetwork
 
 MAX_NOBS = 10000
 NUM_SIMULATIONS = 100
@@ -28,10 +29,11 @@ for epoch in range(NUM_EPOCHS):
     # Generate data (this needs to be pararelised)
     X_train = []
     y_train = []
-    for _ in range(BATCH_SIZE):
-        x, y = data_generator.generate()
-        X_train.append(x)
-        y_train.append(y)
+
+    with Pool() as pool:
+        pool_output = pool.starmap(data_generator.generate, [() for _ in range(BATCH_SIZE)])
+    X_train = [x for x, y in pool_output]
+    y_train = [y for x, y in pool_output]
 
     X_train = torch.Tensor(X_train)
     
